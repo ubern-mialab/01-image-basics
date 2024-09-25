@@ -8,15 +8,10 @@ def load_image(img_path, is_label_img=None):
     # todo: load the image from the image path with the SimpleITK interface (hint: 'ReadImage')
     # todo: if 'is_label_img' is True use argument outputPixelType=sitk.sitkUInt8,
     #  else use outputPixelType=sitk.sitkFloat32
-    """
-    
+    """   
     pixel_type = is_label_img  # todo: modify here
-    img = sitk.ReadImage(img_path)  # todo: modify here
-    if pixel_type:
-        print("outputPixelType=sitk.sitkUInt8")
-    else:
-        print("outputPixelType=sitk.sitkFloat32")
-
+    img = sitk.ReadImage(img_path, outputPixelType=pixel_type)  # todo: modify here
+    
     return img
 
 

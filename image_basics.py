@@ -108,7 +108,7 @@ def extract_feature_median(img):
     EXTRACT_FEATURE_MEDIAN:
     # todo: apply median filter to image (hint: 'Median')
     """
-    median_img = None  # todo: modify here
+    median_img = sitk.Median(img)  # todo: modify here
 
     return median_img
 

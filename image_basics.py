@@ -76,6 +76,8 @@ def register_images(img, label_img, atlas_img):
     # the registration returns the transformation of the moving image (parameter img) to the space of
     # the atlas image (atlas_img)
     """
+    #registration_method = _get_registration_method(atlas_img, img)
+    
     registration_method = sitk.ImageRegistrationMethod(fixed=atlas_img, moving=img)  # type: sitk.ImageRegistrationMethod
     transform = registration_method  # todo: modify here
 

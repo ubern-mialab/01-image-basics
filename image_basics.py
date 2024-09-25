@@ -37,8 +37,9 @@ def to_sitk_image(np_image, reference_img):
     #  (hint: 'CopyInformation')! (otherwise defaults are set)
     """
 
-    img = sitk.GetImageFromArray(np_image).CopyInformation(reference_img)  # todo: modify here
+    img = sitk.GetImageFromArray(np_image)  # todo: modify here
     # todo: ...
+    img.CopyInformation(srcImage=reference_img)
 
     return img
 
@@ -53,7 +54,7 @@ def preprocess_rescale_numpy(np_img, new_min_val, new_max_val):
     min_val = np_img.min()
 
     #Probably try with first subtracting. np_img - min_val
-    rescaled_np_img = np_img / (new_max_val - new_min_val)  # todo: modify here 
+    rescaled_np_img = (np_img - min_val) / (new_max_val - new_min_val)  # todo: modify here 
     
     return rescaled_np_img
 
@@ -76,10 +77,17 @@ def register_images(img, label_img, atlas_img):
     # the registration returns the transformation of the moving image (parameter img) to the space of
     # the atlas image (atlas_img)
     """
-    #registration_method = _get_registration_method(atlas_img, img)
     
-    registration_method = sitk.ImageRegistrationMethod(fixed=atlas_img, moving=img)  # type: sitk.ImageRegistrationMethod
-    transform = registration_method  # todo: modify here
+    """
+    registration_method = _get_registration_method(
+        atlas_img, img
+    )  # type: sitk.ImageRegistrationMethod
+    transform = None  # todo: modify here
+    """
+
+    #registration_method = sitk.ImageRegistrationMethod()  # type: sitk.ImageRegistrationMethod
+        
+    transform = _get_registration_method(atlas_img, img)  # todo: modify here
 
     # todo: apply the obtained transform to register the image (img) to the atlas image (atlas_img)
     # hint: 'Resample' (with referenceImage=atlas_img, transform=transform, interpolator=sitkLinear,
@@ -102,6 +110,44 @@ def register_images(img, label_img, atlas_img):
                                      outputPixelType=label_img.GetPixelIDValue())  # todo: modify here
 
     return registered_img, registered_label
+
+# New added - copy + paste from test_image_basics
+def _get_registration_method(atlas_img, img) -> sitk.ImageRegistrationMethod:
+    registration_method = sitk.ImageRegistrationMethod()
+
+    # Similarity metric settings.
+    registration_method.SetMetricAsMattesMutualInformation(numberOfHistogramBins=50)
+    registration_method.SetMetricSamplingStrategy(registration_method.REGULAR)
+    registration_method.SetMetricSamplingPercentage(0.2)
+
+    registration_method.SetMetricUseFixedImageGradientFilter(False)
+    registration_method.SetMetricUseMovingImageGradientFilter(False)
+
+    registration_method.SetInterpolator(sitk.sitkLinear)
+
+    # Optimizer settings.
+    registration_method.SetOptimizerAsGradientDescent(
+        learningRate=1.0,
+        numberOfIterations=100,
+        convergenceMinimumValue=1e-6,
+        convergenceWindowSize=10,
+    )
+    registration_method.SetOptimizerScalesFromPhysicalShift()
+
+    # Setup for the multi-resolution framework.
+    registration_method.SetShrinkFactorsPerLevel(shrinkFactors=[4, 2, 1])
+    registration_method.SetSmoothingSigmasPerLevel(smoothingSigmas=[2, 1, 0])
+    registration_method.SmoothingSigmasAreSpecifiedInPhysicalUnitsOn()
+
+    # Set initial transform
+    initial_transform = sitk.CenteredTransformInitializer(
+        atlas_img,
+        img,
+        sitk.Euler3DTransform(),
+        sitk.CenteredTransformInitializerFilter.GEOMETRY,
+    )
+    registration_method.SetInitialTransform(initial_transform, inPlace=False)
+    return registration_method
 
 
 def extract_feature_median(img):

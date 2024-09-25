@@ -53,8 +53,8 @@ def preprocess_rescale_numpy(np_img, new_min_val, new_max_val):
     max_val = np_img.max()
     min_val = np_img.min()
 
-    #Probably try with first subtracting. np_img - min_val
-    rescaled_np_img = (np_img - min_val) / (new_max_val - new_min_val)  # todo: modify here 
+    normalized = (np_img - min_val) / (max_val - min_val)
+    rescaled_np_img = new_min_val + normalized * (new_max_val - new_min_val) # todo: modify here 
     
     return rescaled_np_img
 

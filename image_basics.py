@@ -38,7 +38,7 @@ def to_sitk_image(np_image, reference_img):
     #  (hint: 'CopyInformation')! (otherwise defaults are set)
     """
 
-    img = None  # todo: modify here
+    img = sitk.GetImageFromArray(np_image).CopyInformation(reference_img)  # todo: modify here
     # todo: ...
 
     return img

@@ -118,10 +118,10 @@ def postprocess_largest_component(label_img):
     POSTPROCESS_LARGEST_COMPONENT:
     # todo: get the connected components from the label_img (hint: 'ConnectedComponent')
     """
-    connected_components = None  # todo: modify here
+    connected_components = sitk.ConnectedComponent(label_img)  # todo: modify here
 
     # todo: order the component by ascending component size (hint: 'RelabelComponent')
-    relabeled_components = None  # todo: modify here
+    relabeled_components = sitk.RelabelComponent(connected_components)  # todo: modify here
 
     largest_component = relabeled_components == 1  # zero is background
     return largest_component

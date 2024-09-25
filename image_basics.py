@@ -53,8 +53,9 @@ def preprocess_rescale_numpy(np_img, new_min_val, new_max_val):
     max_val = np_img.max()
     min_val = np_img.min()
 
-    rescaled_np_img = np_img / (new_max_val - new_min_val)  # todo: modify here
-
+    #Probably try with first subtracting. np_img - min_val
+    rescaled_np_img = np_img / (new_max_val - new_min_val)  # todo: modify here 
+    
     return rescaled_np_img
 
 
@@ -64,7 +65,7 @@ def preprocess_rescale_sitk(img, new_min_val, new_max_val):
     # todo: rescale the intensities of the img to the range [new_min_val, new_max_val]
     # (hint: RescaleIntensity)
     """
-    rescaled_img = None  # todo: modify here
+    rescaled_img = sitk.RescaleIntensity(img, outputMaximum=new_max_val, outputMinimum=new_min_val)  # todo: modify here
 
     return rescaled_img
 
